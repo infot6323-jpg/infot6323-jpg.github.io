@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dragon Ball — Explorador</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --orange: #FF6B00;
+      --gold: #FFB800;
+      --red: #CC1F1F;
+      --dark: #080808;
+      --card-bg: #111111;
+      --surface: #181818;
+      --text: #EDEDEC;
+      --muted: #888;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── BACKGROUND AURA ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 50% -10%, rgba(255,107,0,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 80% 110%, rgba(204,31,31,0.12) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 48px 40px 36px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,107,0,0.15);
+    }
+
+    .logo-wrap {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 32px;
+    }
+
+    .logo-eyebrow {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      color: var(--orange);
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      line-height: 0.9;
+      letter-spacing: 0.04em;
+      background: linear-gradient(160deg, #fff 30%, var(--gold) 70%, var(--orange) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+    }
+
+    .search-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: min(480px, 90vw);
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 16px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    #search {
+      width: 100%;
+      padding: 14px 18px 14px 46px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,107,0,0.25);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    #search::placeholder { color: var(--muted); }
+
+    #search:focus {
+      border-color: var(--orange);
+      background: rgba(255,107,0,0.07);
+    }
+
+    /* ── STATS BAR ── */
+    #stats-bar {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      padding: 14px 40px;
+      background: rgba(255,107,0,0.06);
+      border-bottom: 1px solid rgba(255,107,0,0.1);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    #stats-bar span { color: var(--gold); }
+
+    /* ── MAIN GRID ── */
+    main {
+      position: relative;
+      z-index: 5;
+      padding: 40px 32px 60px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(.22,.68,0,1.2), box-shadow 0.25s, border-color 0.25s;
+      animation: cardIn 0.4s ease both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(255,107,0,0.2), 0 0 0 1px rgba(255,107,0,0.3);
+      border-color: rgba(255,107,0,0.4);
+    }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: contain;
+      background: #0c0c0c;
+      padding: 12px;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover .card-img { transform: scale(1.04); }
+
+    .card-body {
+      padding: 16px;
+      border-top: 1px solid rgba(255,107,0,0.12);
+    }
+
+    .card-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.45rem;
+      letter-spacing: 0.05em;
+      color: var(--gold);
+      margin-bottom: 10px;
+      line-height: 1;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .tag {
+      font-size: 0.67rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255,107,0,0.12);
+      color: var(--orange);
+      border: 1px solid rgba(255,107,0,0.2);
+    }
+
+    .tag.affil {
+      background: rgba(255,184,0,0.1);
+      color: var(--gold);
+      border-color: rgba(255,184,0,0.2);
+    }
+
+    .card-ki {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .card-ki strong { color: var(--text); }
+
+    /* ── MODAL ── */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(6px);
+    }
+
+    #modal-overlay.open { display: flex; }
+
+    #modal {
+      background: var(--surface);
+      border: 1px solid rgba(255,107,0,0.25);
+      border-radius: 16px;
+      max-width: 560px;
+      width: 100%;
+      overflow: hidden;
+      animation: modalIn 0.28s cubic-bezier(.22,.68,0,1.2);
+      position: relative;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    #modal-close {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: var(--text);
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+      z-index: 2;
+    }
+
+    #modal-close:hover { background: var(--orange); }
+
+    #modal-img {
+      width: 100%;
+      max-height: 340px;
+      object-fit: contain;
+      background: #0a0a0a;
+      padding: 20px;
+    }
+
+    #modal-body {
+      padding: 24px;
+    }
+
+    #modal-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem;
+      letter-spacing: 0.06em;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .modal-field {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
+    .modal-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 3px;
+    }
+
+    .modal-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* ── LOADING / EMPTY ── */
+    .state-msg {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .state-msg .icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .state-msg h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .state-msg p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .spinner {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(255,107,0,0.15);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--dark); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,107,0,0.4); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-wrap">
+      <span class="logo-eyebrow">Universo</span>
+      <h1>Dragon Ball</h1>
+    </div>
+
+    <div class="search-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="search" placeholder="Buscar personagem..." autocomplete="off">
+    </div>
+  </header>
+
+  <div id="stats-bar">
+    <div>Personagens: <span id="count-total">—</span></div>
+    <div>Exibindo: <span id="count-show">—</span></div>
+  </div>
+
+  <main id="container">
+    <div class="state-msg">
+      <div class="spinner"></div>
+      <h2>Carregando</h2>
+      <p>Buscando personagens da API…</p>
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div id="modal-overlay">
+    <div id="modal">
+      <button id="modal-close" aria-label="Fechar">✕</button>
+      <img id="modal-img" src="" alt="">
+      <div id="modal-body">
+        <div id="modal-name"></div>
+        <div class="modal-grid" id="modal-fields"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const container   = document.getElementById('container');
+    const search      = document.getElementById('search');
+    const countTotal  = document.getElementById('count-total');
+    const countShow   = document.getElementById('count-show');
+    const overlay     = document.getElementById('modal-overlay');
+    const modalImg    = document.getElementById('modal-img');
+    const modalName   = document.getElementById('modal-name');
+    const modalFields = document.getElementById('modal-fields');
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    let allChars = [];
+
+    const CHARS = [
+      { name:"Goku (Base Form)",         race:"Saiyan",      gender:"Male",   ki:"60.000.000",     maxKi:"90 Septillion",    affiliation:"Z Fighter",         image:"https://i.pinimg.com/736x/39/c1/45/39c145d3d3bb064080a7e0c85e1b09a4.jpg",       description:"O protagonista da série. Nascido Kakarot, Goku é um Saiyajin enviado à Terra na infância. Ao longo das sagas, torna-se o guerreiro mais poderoso do universo, atingindo transformações como Super Saiyajin, SSJ3 e Ultra Instinct." },
+      { name:"Vegeta (Base Form)",       race:"Saiyan",      gender:"Male",   ki:"54.000.000",     maxKi:"19.84 Septillion", affiliation:"Z Fighter",         image:"https://i.redd.it/azo566dqc7541.jpg", description:"Príncipe dos Saiyajins e rival eterno de Goku. Começa como vilão, mas evolui para um dos heróis mais fortes. Sua determinação e orgulho o impulsionam a superar seus limites constantemente." },
+      { name:"Gohan (Base Form)",        race:"Saiyan",      gender:"Male",   ki:"45.000.000",     maxKi:"40 Septillion",    affiliation:"Z Fighter",         image:"https://w0.peakpx.com/wallpaper/166/287/HD-wallpaper-ultimate-gohan-dragonball-dragonballz-legends-anime-supreme-ki-buu-saga.jpg",    description:"Filho de Goku e Chi-Chi. Possui um potencial oculto imenso que explode na luta contra Cell. É o primeiro meio-Saiyajin a atingir Super Saiyajin 2." },
+      { name:"Piccolo",      race:"Namekian",    gender:"Male",   ki:"2.000.000",      maxKi:"98 Quintillion",   affiliation:"Z Fighter",         image:"https://i.redd.it/yny2fnp9k3aa1.jpg", description:"Namekiano que começa como inimigo de Goku, mas se torna um dos aliados mais leais dos Guerreiros Z. Mentor de Gohan e guerreiro estrategista formidável." },
+      { name:"Frieza (Final form)",       race:"Frieza Race", gender:"Male",   ki:"120.000.000",    maxKi:"21.12 Septillion", affiliation:"Frieza Force",      image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCN96zQvJCWY701NdfN4XEPScz3whmbiWDQw&s", description:"Imperador galáctico e um dos maiores vilões da série. Responsável pela destruição do Planeta Vegeta e pelo extermínio dos Saiyajins. Possui quatro formas de transformação." },
+      { name:"Super Perfect Cell",         race:"Android",     gender:"Male",   ki:"4.000.000.000",    maxKi:"900.000.000",      affiliation:"Red Ribbon Army",   image:"https://i.redd.it/2l7gn3vd03h51.png",  description:"Androide criado pelo Dr. Gero a partir do DNA dos maiores guerreiros da Terra. Sua forma perfeita é atingida ao absorver os Androides 17 e 18, tornando-o imbatível." },
+      { name:"Kid Buu",    race:"Majin",       gender:"Male",   ki:"18.000.000.000", maxKi:"11 Septillion",    affiliation:"Babidi's Forces",   image:"https://i.redd.it/vtilp779kkiz.jpg", description:"Criatura mágica ressuscitada por Babidi. Existe em várias formas, da inocente Fat Buu à devastadora Kid Buu, capaz de destruir planetas inteiros." },
+      { name:"Krillin",      race:"Human",       gender:"Male",   ki:"1.500.000",      maxKi:"1.53 Quadrillion", affiliation:"Z Fighter",         image:"https://i.pinimg.com/originals/0a/04/21/0a0421cb6f80c36f2bca9d9fad87a5ab.jpg", description:"Melhor amigo de Goku e o humano mais forte do mundo. Especialista em Kienzan e Kamehameha. Sua determinação supera as limitações físicas em muitas batalhas." },
+      { name:"Trunks ssj1",       race:"Saiyan",      gender:"Male",   ki:"1.750.000.000",     maxKi:"98 Quadrillion",   affiliation:"Z Fighter",         image:"https://en.dragon-ball-official.com/dragonball/jp/news/2022/08/TrunksSS1_497_SP.jpg?_=1777773120", description:"Filho de Vegeta e Bulma. Vindo do futuro, alerta os Guerreiros Z sobre os Androides. Possui a transformação exclusiva Super Saiyajin Raiva." },
+      { name:"Gotenks ssj3",      race:"Saiyan",      gender:"Male",   ki:"24.000.000.000", maxKi:"90 Quintillion",   affiliation:"Z Fighter",         image:"https://i.pinimg.com/736x/a9/7c/e2/a97ce23e59eab5935bd68ade211fd16a.jpg", description:"Fusão de Goten e Trunks via Dança da Fusão. Extremamente poderoso mas impulsivo e arrogante. Consegue atingir Super Saiyajin 3 dentro do Hiperbolic Time Chamber." },
+      { name:"Android 18",   race:"Android",     gender:"Female", ki:"30.000.000",     maxKi:"30 Quintillion",   affiliation:"Z Fighter",         image:"https://i.pinimg.com/736x/01/a8/92/01a8928b7687d9d60fbf4aaa46dc80df.jpg", description:"Androide criada pelo Dr. Gero, irmã do Android 17. Inicialmente vilã, torna-se aliada dos Z Fighters após se casar com Krillin. Energia ilimitada e força física imensos." },
+      { name:"Android 17",   race:"Android",     gender:"Male",   ki:"30.000.000",     maxKi:"30 Quintillion",   affiliation:"Z Fighter",         image:"https://w0.peakpx.com/wallpaper/894/863/HD-wallpaper-17-android.jpg", description:"Irmão gêmeo do Android 18. Trabalha como guarda-parque antes de ser recrutado para o Torneio do Poder. Seu poder cresceu enormemente em Dragon Ball Super." },
+      { name:"Vegito ssj1",       race:"Saiyan",      gender:"Male",   ki:"1.000.000.000",  maxKi:"Infinite",         affiliation:"Z Fighter",         image:"https://scontent-gig4-1.cdninstagram.com/v/t51.82787-15/619227502_17912007258278310_2703021607284667121_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ig_cache_key=MzQzODE0ODI1NzA4NTQxOTkzNg%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=6a4eQpql5lwQ7kNvwH1TIbH&_nc_oc=AdrmL5rW7tT5NK3WrVOAQtjDeGsguGx_Rqu9nZVgh2_9At8f4GfCSYf0s7wZOY8AvPU&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-gig4-1.cdninstagram.com&_nc_gid=4E-_xb4_6EYTVtngkUTLTQ&_nc_ss=7a22e&oh=00_Af7LkBKeLoAPpHrCL4CV7zM6adlZ7puZ1y8kzd3tvKyvcA&oe=6A0D1A48", description:"Fusão perfeita de Goku e Vegeta via Brincos Potaras. Considerado o ser mais poderoso do universo. Combina a alegria de Goku com o orgulho de Vegeta de forma letal." },
+      { name:"Gogeta ssj1",       race:"Saiyan",      gender:"Male",   ki:"1.000.000.000",  maxKi:"Infinite",         affiliation:"Z Fighter",         image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeNd88dieQeIPsyaWC1PXtmNpLJBgHdxtguA&s", description:"Fusão de Goku e Vegeta pela Dança da Fusão. Mais eficiente que Vegito pois a fusão não é permanente. Derrota Janemba e, em Super, Broly em sua forma Lendária." },
+      { name:"Broly",        race:"Saiyan",      gender:"Male",   ki:"1.400.000.000",  maxKi:"11.2 Septillion",  affiliation:"Villain",           image:"https://i.redd.it/8egcqdip5nid1.jpeg", description:"O Saiyajin Lendário. Nasceu com um nível de poder absurdo de 10.000, tornando-o uma ameaça desde o nascimento. Sua raiva primal o transforma em uma força da natureza impossível de controlar." },
+    ];
+
+    function fetchChars() {
+      allChars = CHARS;
+      countTotal.textContent = allChars.length;
+      render(allChars);
+    }
+
+    function render(list) {
+      countShow.textContent = list.length;
+
+      if (!list.length) {
+        container.innerHTML = `
+          <div class="state-msg">
+            <div class="icon">🔍</div>
+            <h2>Sem resultados</h2>
+            <p>Nenhum personagem encontrado para "<strong>${search.value}</strong>"</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = '';
+
+      list.forEach((c, i) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.animationDelay = `${Math.min(i * 0.04, 0.6)}s`;
+
+        card.innerHTML = `
+          <img class="card-img" src="${c.image || ''}" alt="${c.name}" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">${c.name}</div>
+            <div class="card-tags">
+              ${c.race       ? `<span class="tag">${c.race}</span>` : ''}
+              ${c.gender     ? `<span class="tag">${c.gender}</span>` : ''}
+              ${c.affiliation? `<span class="tag affil">${c.affiliation}</span>` : ''}
+            </div>
+            <div class="card-ki"><strong>Ki:</strong> ${c.ki || '—'}</div>
+          </div>`;
+
+        card.addEventListener('click', () => openModal(c));
+        container.appendChild(card);
+      });
+    }
+
+    function openModal(c) {
+      modalImg.src = c.image || '';
+      modalImg.alt = c.name;
+      modalName.textContent = c.name;
+
+      const fields = [
+        ['Raça',        c.race],
+        ['Gênero',      c.gender],
+        ['Ki',          c.ki],
+        ['Ki Máximo',   c.maxKi],
+        ['Afiliação',   c.affiliation],
+        ['Descrição',   c.description],
+      ].filter(([, v]) => v);
+
+      modalFields.innerHTML = fields.map(([label, val]) => `
+        <div class="modal-field ${label === 'Descrição' ? 'full' : ''}">
+          <div class="modal-label">${label}</div>
+          <div class="modal-value">${val}</div>
+        </div>`).join('');
+
+      // span description full width
+      modalFields.querySelectorAll('.full').forEach(el => el.style.gridColumn = '1 / -1');
+
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    search.addEventListener('input', () => {
+      const q = search.value.toLowerCase().trim();
+      render(q ? allChars.filter(c => c.name.toLowerCase().includes(q)) : allChars);
+    });
+
+    fetchChars();
+  </script>
+</body>
+</html>
